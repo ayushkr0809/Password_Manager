@@ -1,0 +1,7 @@
+secret.key
+secret1.key
+*.pickle
+*.dat
+__pycache__/
+*.pyc
+.env
