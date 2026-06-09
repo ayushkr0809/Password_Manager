@@ -23,7 +23,7 @@ key = load_key()
 fernet = Fernet(key)
 
 # =========================
-# PORTABLE DB PASSWORD
+# DB PASSWORD
 # =========================
 
 DB_PASSWORD = maskpass.askpass("Enter MySQL password: ")
@@ -45,7 +45,7 @@ def init_db():
 
     temp_cursor.execute("""
     CREATE TABLE IF NOT EXISTS userpas (
-        id INT PRIMARY KEY,
+        id INT AUTO_INCREMENT PRIMARY KEY,
         username BLOB,
         passwd BLOB
     )
@@ -187,7 +187,7 @@ def main_menu(user_id):
 3. Update existing password
 4. Find record
 5. Exit
-""")
+        """)
 
         choice = input("Enter choice: ")
 
@@ -206,7 +206,7 @@ def main_menu(user_id):
             print("Invalid input.")
 
 # =========================
-# AUTH SYSTEM
+# AUTH SYSTEM (FIXED LOGIN ONLY)
 # =========================
 
 def authenticate():
@@ -240,16 +240,12 @@ def authenticate():
         password_ver = maskpass.askpass("Re-enter password: ", mask="*")
 
         if password == password_ver:
-            cursor.execute("SELECT MAX(id) FROM userpas")
-            max_id = cursor.fetchone()[0]
-            user_id = (max_id + 1) if max_id else 1
-
             enc_username = fernet.encrypt(username.encode())
             enc_password = fernet.encrypt(password.encode())
 
             cursor.execute(
-                "INSERT INTO userpas (id, username, passwd) VALUES (%s, %s, %s)",
-                (user_id, enc_username, enc_password)
+                "INSERT INTO userpas (username, passwd) VALUES (%s, %s)",
+                (enc_username, enc_password)
             )
             con.commit()
 
